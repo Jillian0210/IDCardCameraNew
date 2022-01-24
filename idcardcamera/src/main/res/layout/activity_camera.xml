@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pb_camera_color_black">
+
+    <!--相机预览-->
+    <com.pengbo.idcardcamera.camera.CameraPreview
+        android:id="@+id/camera_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <!--遮罩层-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <!--顶部关闭按钮-->
+        <RelativeLayout
+            android:id="@+id/view_camera_crop_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/iv_camera_close"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="15dp"
+                android:padding="5dp"
+                android:layout_alignParentRight="true"
+                android:src="@mipmap/camera_close" />
+        </RelativeLayout>
+
+
+        <!--中间-->
+
+        <!--相机裁剪区域 设置高度和宽度的比例 在代码中进行设置-->
+        <ImageView
+            android:layout_below="@+id/view_camera_crop_top"
+            android:id="@+id/iv_camera_crop"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="fitXY" />
+
+        <!--提示-->
+        <TextView
+            android:layout_below="@+id/iv_camera_crop"
+            android:id="@+id/view_camera_crop_hint"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/tips_bg"
+            android:gravity="center"
+            android:paddingTop="5dp"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:paddingBottom="5dp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/idcard_back_tips"
+            android:textColor="@color/pb_camera_color_wight"
+            android:textSize="16dp" />
+
+
+        <!--底部操作布局-->
+        <RelativeLayout
+            android:id="@+id/fl_camera_option"
+            android:layout_width="match_parent"
+            android:layout_height="136dp"
+            android:background="@color/pb_camera_preview_mock"
+            android:layout_alignParentBottom="true"
+            android:gravity="bottom">
+
+            <ImageView
+                android:id="@+id/iv_camera_take"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_centerInParent="true"
+                android:layout_margin="32dp"
+                android:src="@mipmap/camera_take" />
+
+            <ImageView
+                android:id="@+id/iv_camera_flash"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="15dp"
+                android:padding="5dp"
+                android:src="@mipmap/camera_flash_off"
+                android:scaleType="centerInside"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/iv_choose_image"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="15dp"
+                android:scaleType="centerInside"
+                android:src="@mipmap/camera_choose_image" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+</RelativeLayout>
