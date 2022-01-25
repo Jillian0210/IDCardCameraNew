@@ -39,7 +39,8 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation project(':idcardcamera')
+//    implementation project(':idcardcamera')
+    implementation 'com.github.Jillian0210:IDCardCameraNew:v2.0.0'
     /*leakcanary*/
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'
