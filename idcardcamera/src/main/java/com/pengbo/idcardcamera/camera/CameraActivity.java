@@ -72,7 +72,7 @@ public class CameraActivity extends Activity implements View.OnClickListener, Se
         super.onCreate(savedInstanceState);
 
         // TODO: 2022/1/13 测试状态下打开
-        LogToFileUtils.init(getApplicationContext());
+//        LogToFileUtils.init(getApplicationContext());
         //动态请求需要的权限
         boolean checkPermissionFirst = PermissionUtils.checkPermissionFirst(this, IDCardCamera.PERMISSION_CODE_FIRST,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA});
