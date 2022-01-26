@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 
 import java.io.Closeable;
@@ -112,7 +113,7 @@ public  class FileUtils {
             file = context.getCacheDir();
         }
         String path = file.getPath() + "/cache";
-        LogToFileUtils.write("获取缓存图片的目录,path="+path);
+        LogToFileUtils.write("[getImageCacheDir] , get image cache path="+path);
         File cachePath = new File(path);
         if (!cachePath.exists())
             cachePath.mkdir();
@@ -157,12 +158,28 @@ public  class FileUtils {
     public static Uri getTempSchemeFileUri(@NonNull Context context, String suffix) {
         String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
         File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/" + timeStamp + (TextUtils.isEmpty(suffix) ? ".jpg" : suffix));
-        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-        return Uri.fromFile(file);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            String fileProvider = context.getPackageName();
+            if (!TextUtils.isEmpty(fileProvider)) {
+                fileProvider = fileProvider + ".fileprovider";
+            }
+            try {
+                uri = FileProvider.getUriForFile(context, fileProvider, file);// android 10 fixed
+            } catch (Exception e) {
+                uri = Uri.fromFile(file);
+            }
+        } else {
+            uri = Uri.fromFile(file);
+        }
+        return uri;
     }
     public static Uri getTempSchemeUri(@NonNull Context context) {
 //        if ( Build.VERSION.SDK_INT >= 30){
-//            return getTempSchemeUriR(context);
+//            return getTempSchemeUriRForSysCrop(context);
 //        }else {
             return getTempSchemeFileUri(context);
 //        }
@@ -174,7 +191,7 @@ public  class FileUtils {
      * @param context
      * @return
      */
-    private static Uri getTempSchemeUriR(@NonNull Context context){
+    private static Uri getTempSchemeUriRForSysCrop(@NonNull Context context){
         String fileName = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date())+"_CROP.jpg";
 
         File imgFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + File.separator + fileName);
