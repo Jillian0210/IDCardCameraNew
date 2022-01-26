@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 
+import com.pengbo.idcardcamera.utils.LogToFileUtils;
+
 import java.lang.ref.WeakReference;
 
 /**
@@ -82,6 +84,20 @@ public class IDCardCamera {
             return data.getStringExtra(IMAGE_PATH);
         }
         return "";
+    }
+
+    /**
+     * 开启写入日志文件
+     * @param b
+     */
+    public  void startLogWriteFile(boolean b){
+        if (mActivity!=null){
+            LogToFileUtils.init(mActivity.get());
+            LogToFileUtils.setEnable(b);
+        }else if (mFragment!=null){
+            LogToFileUtils.init(mFragment.get().getActivity());
+            LogToFileUtils.setEnable(b);
+        }
     }
 }
 

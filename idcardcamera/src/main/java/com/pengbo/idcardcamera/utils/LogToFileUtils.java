@@ -1,4 +1,5 @@
 package com.pengbo.idcardcamera.utils;
+
 import android.content.Context;
 import android.os.Environment;
 import android.text.format.Formatter;
@@ -14,7 +15,7 @@ public class LogToFileUtils {
     /**
      * 上下文对象
      */
-    private static Context      mContext;
+    private static Context mContext;
     /**
      * FileLogUtils类的实例
      */
@@ -22,11 +23,11 @@ public class LogToFileUtils {
     /**
      * 用于保存日志的文件
      */
-    private static File         logFile;
+    private static File logFile;
     /**
      * 日志中的时间显示格式
      */
-    private static       SimpleDateFormat logSDF       = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat logSDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     /**
      * 日志的最大占用空间 - 单位：字节
      * <p>
@@ -38,7 +39,7 @@ public class LogToFileUtils {
      * <p>
      * 默认10M
      */
-    private static final int              LOG_MAX_SIZE = 10 * 1024 * 1024;
+    private static final int LOG_MAX_SIZE = 10 * 1024 * 1024;
     /**
      * 以调用者的类名作为TAG
      */
@@ -71,6 +72,17 @@ public class LogToFileUtils {
         }
     }
 
+    private static boolean enable = false;
+
+    /**
+     * 是否使用 写入文件
+     *
+     * @param b
+     */
+    public static void setEnable(boolean b) {
+        enable = b;
+    }
+
     /**
      * 写入日志文件的数据
      *
@@ -79,9 +91,13 @@ public class LogToFileUtils {
     public static void write(Object str) {
         // 判断是否初始化或者初始化是否成功
 //        Toast.makeText(mContext, (String) str,Toast.LENGTH_SHORT).show();
-        Log.d(MY_TAG,(String) str);
+        Log.d(MY_TAG, (String) str);
         if (null == mContext || null == instance || null == logFile || !logFile.exists()) {
             Log.e(MY_TAG, "Initialization failure !!!");
+            return;
+        }
+        if (enable){
+            //开启写入文件
             return;
         }
         String logStr = getFunctionInfo() + " - " + str.toString();
@@ -108,7 +124,7 @@ public class LogToFileUtils {
     private static void resetLogFile() {
         Log.i(MY_TAG, "Reset Log File ... ");
         // 创建lastLog.txt，若存在则删除
-        File lastLogFile = new File(logFile.getParent() + "拍照日志2.txt");
+        File lastLogFile = new File(logFile.getParent() + "拍照日志.txt");
         if (lastLogFile.exists()) {
             lastLogFile.delete();
         }

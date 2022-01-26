@@ -53,16 +53,16 @@ public class ChooseImageManager {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             ComponentName componentName = intent.resolveActivity(mContext.getPackageManager());
             if (componentName != null) {
-                LogToFileUtils.write("takeImageFromGallery, componentName!=null");
+                LogToFileUtils.write("[takeImageFromGallery], start intent activity");
                 mContext.startActivityForResult(intent, IDCardCamera.TYPE_GALLERY);
             } else {
-                LogToFileUtils.write("takeImageFromGallery, componentName==null ");
+                LogToFileUtils.write("[takeImageFromGallery], Activity is illegal ");
                 if (mOnSelectListener != null) {
                     mOnSelectListener.onError("takeImageFromGallery---> Activity is illegal");
                 }
             }
         } else {
-            LogToFileUtils.write("打开图片库,无权限");
+            LogToFileUtils.write("[takeImageFromGallery], has no permission");
             mOnSelectListener.onError("checkPermission---->");
         }
     }
@@ -83,16 +83,17 @@ public class ChooseImageManager {
             if (requestCode == IDCardCamera.TYPE_GALLERY) {
                 //图库选择图片
                 if (data != null) {
-                    LogToFileUtils.write("图库选择图片返回 成功");
+                    LogToFileUtils.write("[handleResult],choose image from gallery success");
                     //获取图片的uri
                     Uri uri = data.getData();
                     //保存图片到mCropUri
                     mCropUri = FileUtils.getTempSchemeUri(mContext);
 
                     //跳转到裁剪页面
-                    LogToFileUtils.write("跳转到裁剪页面:原图路径uri=" + uri + ",输出路径=" + mCropUri);
+                    LogToFileUtils.write("[handleResult],origin uri=" + uri + ",after crop uri=" + mCropUri);
                     if (isSystemCrop){
                         //系统裁剪
+                        LogToFileUtils.write("[handleResult],start system copper");
                         handleSysCropImage(mContext, uri, mCropUri);
                     }else {
                         //2021/11/11  自定义裁剪
@@ -103,10 +104,11 @@ public class ChooseImageManager {
                                 .withOptions(options)
                                 .withAspectRatio(IDCardCamera.ID_CARD_RATIO_WIDTH, IDCardCamera.ID_CARD_RATIO_HEIGHT)
                                 .start(mContext);
+                        LogToFileUtils.write("[handleResult],start ucrop copper");
                     }
 
                 } else {
-                    LogToFileUtils.write("图库选择图片返回 失败");
+                    LogToFileUtils.write("[handleResult],choose image from gallery fail");
                     if (mOnSelectListener != null) {
                         mOnSelectListener.onError("uri is null before crop !");
                     }
@@ -114,7 +116,7 @@ public class ChooseImageManager {
 
             } else if (requestCode == IDCardCamera.TYPE_SELECT_IMG_SYS_CROP) {
                 //系统裁剪之后发返回值
-                LogToFileUtils.write("系统裁剪页面裁剪页面返回:mCropUri=" + mCropUri);
+
                 Bitmap bitmapFormUri = ImageUtils.getBitmapFromUri(mContext, mCropUri);
                 if (mOnSelectListener != null) {
                     if (null == bitmapFormUri) {
@@ -122,12 +124,12 @@ public class ChooseImageManager {
                         return;
                     }
                     mOnSelectListener.onSuccess(bitmapFormUri);
+                    LogToFileUtils.write("[handleResult],use system cropper and crop success");
                 }
             } else if (requestCode == UCrop.REQUEST_CROP) {
                 //自定义裁剪
                 final Uri resultUri = UCrop.getOutput(data);
-                LogToFileUtils.write("自定义裁剪页面返回裁剪后的uri:resultUri=" + resultUri);
-
+                LogToFileUtils.write("[handleResult],use ucrop  cropper, crop result uri="+resultUri);
                 Bitmap bitmapFormUri = ImageUtils.getBitmapFromUri(mContext, resultUri);
                 if (mOnSelectListener != null) {
                     if (null == bitmapFormUri) {
@@ -135,12 +137,16 @@ public class ChooseImageManager {
                         return;
                     }
                     mOnSelectListener.onSuccess(bitmapFormUri);
+                    LogToFileUtils.write("[handleResult],use ucrop cropper, crop success");
                 }
 
             }
         } else if (resultCode == UCrop.RESULT_ERROR) {
-            final Throwable cropError = UCrop.getError(data);
-            LogToFileUtils.write("自定义裁剪页面返回裁剪后的uri:resultUri=" + cropError.toString());
+            if (data!=null){
+                final Throwable cropError = UCrop.getError(data);
+                LogToFileUtils.write("[handleResult],use ucrop cropper, crop error="+(cropError!=null?cropError.toString():null));
+            }
+
         }
 
     }
@@ -185,7 +191,6 @@ public class ChooseImageManager {
         intent.putExtra("scaleUpIfNeeded", true);
         //输出图片到指定位置
         intent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
-        LogToFileUtils.write("打开系统自带的裁剪图片的intent:图片路径 outputUri=" + outputUri);
         activity.startActivityForResult(intent, IDCardCamera.TYPE_SELECT_IMG_SYS_CROP);
     }
 

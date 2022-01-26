@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
      * 身份证正面
      */
     public void front(View view) {
+        IDCardCamera.create(this).startLogWriteFile(true);
         IDCardCamera.create(this).openCamera(IDCardCamera.TYPE_IDCARD_FRONT,true,IDCardCamera.TYPE_IDCARD_FRONT);
     }
 
@@ -36,11 +37,13 @@ public class MainActivity extends AppCompatActivity {
      * 身份证反面
      */
     public void back(View view) {
+        IDCardCamera.create(this).startLogWriteFile(true);
         IDCardCamera.create(this).openCamera(IDCardCamera.TYPE_IDCARD_BACK,true,IDCardCamera.TYPE_IDCARD_BACK);
     }
 
 
     public void bank(View view){
+        IDCardCamera.create(this).startLogWriteFile(true);
         IDCardCamera.create(this).openCamera(IDCardCamera.TYPE_BANK,true,IDCardCamera.TYPE_BANK);
     }
     @Override
