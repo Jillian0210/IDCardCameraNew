@@ -167,6 +167,7 @@ public class ImageUtils {
         image.compress(Bitmap.CompressFormat.JPEG, 100, out);
         Log.d(TAG, "compressByMatrix:init 100  "+out.toByteArray().length/1024+"KB");
 
+        //100kb/原始大小 ，再开平方，先把宽
         float zoom = (float)Math.sqrt(size * 1024 / (float)out.toByteArray().length);
 
         Matrix matrix = new Matrix();
@@ -175,19 +176,14 @@ public class ImageUtils {
         //缩放比例 zoom= 100*1024/origin 开平方
         Bitmap result = Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, true);
 
-        //缩放之后的，获取result数据流放在out里面，
-        out.reset();
-        result.compress(Bitmap.CompressFormat.JPEG, 100, out);
-        Log.d(TAG, "compressByMatrix:compress 100  "+out.toByteArray().length/1024+"KB");
 
         //压缩质量到75
         out.reset();
         result.compress(Bitmap.CompressFormat.JPEG, 75, out);
         Log.d(TAG, "compressByMatrix:compress 75  "+out.toByteArray().length/1024+"KB");
 
-        //如果还是大于100KB那就进行 循环压缩
+        //如果还是大于100KB那就进行 缩小宽高，循环压缩
         while(out.toByteArray().length > size * 1024){
-            Log.d(TAG, "while start compressByMatrix: "+out.toByteArray().length/1024+"KB");
             matrix.setScale(0.9f, 0.9f);
             result = Bitmap.createBitmap(result, 0, 0, result.getWidth(), result.getHeight(), matrix, true);
             out.reset();
