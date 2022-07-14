@@ -72,7 +72,18 @@ public class CropImageView extends TransformImageView {
     public void cropAndSaveImage(@NonNull Bitmap.CompressFormat compressFormat, int compressQuality,
                                  @Nullable BitmapCropCallback cropCallback) {
         cancelAllAnimations();
-        setImageToWrapCropBounds(false);
+//        setImageToWrapCropBounds(false);
+
+        //如果图片宽高>=裁剪蒙版宽高，直接用mCropRect(初始化蒙版的高度)
+        //如果宽高<裁剪图片宽高，需要重新计算mCropRect，否侧裁剪的范围大于图片的尺寸，会报错
+        if (mBitmapLaidOut && !isImageWrapCropBounds()) {
+            //没有填充边界，重新计算裁剪的CropRect
+            RectF rectF = RectUtils.trapToRect(mCurrentImageCorners);
+            mCropRect.left = Math.max(mCropRect.left, rectF.left);
+            mCropRect.top=Math.max(mCropRect.top,rectF.top);
+            mCropRect.right=Math.min(mCropRect.right,rectF.right);
+            mCropRect.bottom=Math.min(mCropRect.bottom,rectF.bottom);
+        }
 
         final ImageState imageState = new ImageState(
                 mCropRect, RectUtils.trapToRect(mCurrentImageCorners),
@@ -264,6 +275,9 @@ public class CropImageView extends TransformImageView {
         removeCallbacks(mZoomImageToPositionRunnable);
     }
 
+    /**
+     * 只有第一次加载图片后进行图片缩放到裁剪图片大小，其它情况下不做此处理
+     */
     public void setImageToWrapCropBounds() {
         setImageToWrapCropBounds(true);
     }
@@ -275,6 +289,8 @@ public class CropImageView extends TransformImageView {
      * {@link WrapCropBoundsRunnable} which animates image.
      * Scale value must be calculated only if image won't fill the crop bounds after it's translated to the
      * crop bounds rectangle center. Using temporary variables this method checks this case.
+     *
+     * 图片回弹到裁剪框的范围
      */
     public void setImageToWrapCropBounds(boolean animate) {
         if (mBitmapLaidOut && !isImageWrapCropBounds()) {
@@ -311,7 +327,6 @@ public class CropImageView extends TransformImageView {
                         tempCropRect.height() / currentImageSides[1]);
                 deltaScale = deltaScale * currentScale - currentScale;
             }
-
             if (animate) {
                 post(mWrapCropBoundsRunnable = new WrapCropBoundsRunnable(
                         CropImageView.this, mImageToWrapCropBoundsAnimDuration, currentX, currentY, deltaX, deltaY,
@@ -623,7 +638,7 @@ public class CropImageView extends TransformImageView {
                 cropImageView.zoomInImage(mOldScale + newScale, mDestX, mDestY);
                 cropImageView.post(this);
             } else {
-                cropImageView.setImageToWrapCropBounds();
+//                cropImageView.setImageToWrapCropBounds();
             }
         }
 

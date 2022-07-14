@@ -225,12 +225,12 @@ public class UCropActivity extends AppCompatActivity {
 
     private void resetRotation() {
         mGestureCropImageView.postRotate(-mGestureCropImageView.getCurrentAngle());
-        mGestureCropImageView.setImageToWrapCropBounds();
+//        mGestureCropImageView.setImageToWrapCropBounds();
     }
 
     private void rotateByAngle(int angle) {
         mGestureCropImageView.postRotate(angle);
-        mGestureCropImageView.setImageToWrapCropBounds();
+//        mGestureCropImageView.setImageToWrapCropBounds();
     }
 
 
