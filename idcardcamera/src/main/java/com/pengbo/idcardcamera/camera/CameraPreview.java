@@ -2,6 +2,7 @@ package com.pengbo.idcardcamera.camera;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.util.AttributeSet;
@@ -60,12 +61,26 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
                 //设置最佳预览大小
                 Camera.Parameters parameters = camera.getParameters();
-                Point cameraResolution = getCameraResolution(parameters, new Point(ScreenUtils.getScreenWidth(mContext), ScreenUtils.getScreenHeight(mContext)));
+                Point screenResolution = new Point(ScreenUtils.getScreenWidth(mContext), ScreenUtils.getScreenHeight(mContext));
+                Point cameraResolution = getCameraResolution(parameters, screenResolution);
+                Log.d(TAG, "surfaceCreated: " + cameraResolution.x + "," + cameraResolution.y);
                 parameters.setPreviewSize(cameraResolution.x, cameraResolution.y);
 
                 camera.setParameters(parameters);
                 camera.startPreview();
                 focus();//首次对焦
+
+
+//                Matrix matrix = calculateSurfaceHolderTransform(screenResolution, cameraResolution);
+//                float[] values = new float[9];
+//                matrix.getValues(values);
+//                this.setTranslationX(values[Matrix.MTRANS_X]);
+//                this.setTranslationY(values[Matrix.MTRANS_Y]);
+//                this.setScaleX(values[Matrix.MSCALE_X]);
+//                this.setScaleY(values[Matrix.MSCALE_Y]);
+//                this.invalidate();
+
+
             } catch (Exception e) {
                 Log.d(TAG, "Error setting camera preview: " + e.getMessage());
                 try {
@@ -96,10 +111,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         float tmp = 0f;
         float mindiff = 100f;
         float x_d_y = (float) screenResolution.x / (float) screenResolution.y;
+        if (x_d_y < 1) {
+            //保证x是大的那个
+            x_d_y = (float) screenResolution.y / (float) screenResolution.x;
+        }
         Camera.Size best = null;
         List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
         for (Camera.Size s : supportedPreviewSizes) {
-            tmp = Math.abs(((float) s.height / (float) s.width) - x_d_y);
+            tmp = Math.abs(( (float) s.width/(float) s.height) - x_d_y);
             if (tmp < mindiff) {
                 mindiff = tmp;
                 best = s;
@@ -198,4 +217,36 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mSurfaceHolder.addCallback(this);
         }
     }
+    //直接对surfaceView进行matrix会对裁剪产生影响，需要对裁剪尺寸进行matrix变化
+    public Matrix calculateSurfaceHolderTransform(Point screenResolution,Point cameraResolution) {
+        // 预览 View 的大小，比如 SurfaceView
+        int viewHeight = Math.min(screenResolution.x, screenResolution.y);
+        int viewWidth = Math.max(screenResolution.x, screenResolution.y);
+        // 相机选择的预览尺寸
+        int cameraHeight = Math.min(cameraResolution.x, cameraResolution.y);
+        int cameraWidth = Math.max(cameraResolution.x, cameraResolution.y);
+        // 计算出将相机的尺寸 => View 的尺寸需要的缩放倍数
+        float ratioPreview = (float) cameraWidth / cameraHeight;
+        float ratioView = (float) viewWidth / viewHeight;
+        float scaleX, scaleY;
+        if (ratioView < ratioPreview) {
+            scaleX = ratioPreview / ratioView;
+            scaleY = 1;
+        } else {
+            scaleX = 1;
+            scaleY = ratioView / ratioPreview;
+        }
+        // 计算出 View 的偏移量
+        float scaledWidth = viewWidth * scaleX;
+        float scaledHeight = viewHeight * scaleY;
+        float dx = (viewWidth - scaledWidth) / 2;
+        float dy = (viewHeight - scaledHeight) / 2;
+
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleX, scaleY);
+        matrix.postTranslate(dx, dy);
+
+        return matrix;
+    }
+
 }
