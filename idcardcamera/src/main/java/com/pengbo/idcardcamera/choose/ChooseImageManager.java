@@ -17,7 +17,7 @@ import com.pengbo.idcardcamera.utils.LogToFileUtils;
 import com.pengbo.idcardcamera.utils.ScreenUtils;
 import com.pengbo.idcardcamera.utils.ImageUtils;
 import com.pengbo.idcardcamera.utils.PermissionUtils;
-import com.yalantis.ucrop.UCrop;
+import com.pengbo.ucrop.UCrop;
 
 /**
  * @author 从相册中选择照片
