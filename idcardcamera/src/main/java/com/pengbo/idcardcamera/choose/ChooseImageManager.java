@@ -56,10 +56,11 @@ public class ChooseImageManager {
                 LogToFileUtils.write("[takeImageFromGallery], start intent activity");
                 mContext.startActivityForResult(intent, IDCardCamera.TYPE_GALLERY);
             } else {
-                LogToFileUtils.write("[takeImageFromGallery], Activity is illegal ");
-                if (mOnSelectListener != null) {
-                    mOnSelectListener.onError("takeImageFromGallery---> Activity is illegal");
-                }
+                //部份手机找不到对应componentName，不做uri限制
+                LogToFileUtils.write("[takeImageFromGallery], EXTERNAL_CONTENT_URI activity is illegal ");
+                Intent intent2 = new Intent(Intent.ACTION_PICK);
+                intent2.setType("image/*");
+                mContext.startActivityForResult(intent2, IDCardCamera.TYPE_GALLERY);
             }
         } else {
             LogToFileUtils.write("[takeImageFromGallery], has no permission");
